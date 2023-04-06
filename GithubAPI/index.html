@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Github  Profile Search</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+    <div class="flex justify-center items-center min-h-screen">
+      <div class="w-full max-w-md">
+        <form class="bg-white shadow-lg rounded-lg px-8 pt-6 pb-8 mb-4" id="search-form" >
+          <h2 class="text-2xl font-bold mb-4 text-center">Search for a GitHub User</h2>
+          <div class="mb-4">
+            <label class="block text-gray-700 font-bold mb-2" for="username">
+              Username
+            </label>
+            <input
+              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="username"
+              type="text"
+              placeholder="Enter GitHub Username"
+            />
+          </div>
+          <div class="flex justify-center">
+            <button
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              type="submit"
+            >
+              Search
+            </button>
+          </div>
+        </form>
+        <div class="bg-white shadow-lg rounded-lg p-8 mb-4 hidden" id="profile-card">
+          <div class="flex justify-center items-center mb-4">
+            <img
+              class="w-24 h-24 rounded-full mr-4"
+              id="avatar"
+              src=""
+              alt="GitHub User Avatar"
+            />
+            <div>
+              <h2 class="text-2xl font-bold" id="name"></h2>
+              <p class="text-gray-700 text-lg" id="username-display"></p>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-4 mb-4">
+            <div class="bg-blue-100 py-2 px-4 rounded-lg">
+              <h3 class="text-blue-500 font-bold text-lg">Followers</h3>
+              <p class="text-gray-700 text-xl font-bold" id="followers"></p>
+            </div>
+            <div class="bg-blue-100 py-2 px-4 rounded-lg">
+              <h3 class="text-blue-500 font-bold text-lg">Following</h3>
+              <p class="text-gray-700 text-xl font-bold" id="following"></p>
+            </div>
+            <div class="bg-blue-100 py-2 px-4 rounded-lg">
+              <h3 class="text-blue-500 font-bold text-lg">Public Repos</h3>
+              <p class="text-gray-700 text-xl font-bold" id="public-repos"></p>
+            </div>
+          </div>
+          <div class="mb-4">
+            <h3 class="text-blue-500 font-bold text-lg">Location</h3>
+            <p class="text-gray-700 text-lg" id="location"></p>
+          </div>
+          <div class="mb-4">
+            <h3 class="text-blue-500 font-bold text-lg">Bio</h3>
+            <p class="text-gray-700 text-lg" id="bio"></p>
+          </div>
+          <div class="flex justify-center">
+            <a
+              class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              id="view-profile"
+              href=""
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Profile
+            </a>
+          </div>
+        </div>
+        <p class="text-red-500 text-center hidden" id="not-found">
+          User not found. Please try again.
+        </p>
+      </div>
+    </div>
+      <script>
+  function getUserProfileDetails(event){
+        event.preventDefault();
+        const usernameInput = document.querySelector('#username');
+        const profile = document.querySelector('#profile-card');
+        const notFound =  document.querySelector('#not-found');
+        const usernameDisplay = document.querySelector('#username-display');
+        const followers = document.querySelector('#followers');
+        const following = document.querySelector('#following');
+        const publicRepos = document.querySelector('#public-repos');
+        const location = document.querySelector('#location');
+        const name = document.querySelector('#name');
+        const viewProfile = document.querySelector("#view-profile")
+        const username = usernameInput.value;
+           fetch(`https://api.github.com/users/${username}`)
+               .then(response => {
+                   if (response.ok) {
+                    return response.clone().json()
+                   } else {
+                       throw new Error('User not found.');
+                   }
+               })
+               .then(data => {
+                 console.log(data)
+                   profile.classList.remove('hidden');
+                   notFound.classList.add('hidden');
+                   avatar.src = data.avatar_url;
+                   name.textContent = data.name;
+                   usernameDisplay.textContent = data.login;
+                   followers.textContent = data.followers;
+                   following.textContent = data.following;
+                   publicRepos.textContent = data.public_repos;
+                   location.textContent = data.location || 'N/A';
+                   viewProfile.href = `https://github.com/${data.login}`
+               })
+               .catch(error => {
+                   profile.classList.add('hidden');
+                   notFound.classList.remove('hidden');
+                   console.error(error);
+               });
+              }
+
+         const form = document.getElementById('search-form');
+         form.addEventListener('submit', getUserProfileDetails);
+      
+   </script>  
+  </body>
+</html>
+  
+    
